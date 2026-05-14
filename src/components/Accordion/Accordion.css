@@ -1,0 +1,82 @@
+.dls-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  border: 1px solid #d4d8df;
+  border-radius: 0.5rem;
+  background: #ffffff;
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    'Helvetica Neue',
+    sans-serif;
+  color: #1f2330;
+}
+
+.dls-accordion__item + .dls-accordion__item {
+  border-top: 1px solid #e3e6ec;
+}
+
+.dls-accordion__heading {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.dls-accordion__trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+  background: transparent;
+  border: 0;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+}
+
+.dls-accordion__trigger:hover {
+  background: #f3f5f9;
+}
+
+.dls-accordion__trigger:focus-visible {
+  outline: 2px solid #3964ff;
+  outline-offset: -2px;
+  border-radius: 0.35rem;
+}
+
+.dls-accordion__trigger[aria-disabled='true'] {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.dls-accordion__chevron {
+  font-size: 1.1rem;
+  width: 1rem;
+  text-align: center;
+  transition: transform 120ms ease-in-out;
+}
+
+.dls-accordion__trigger[data-state='open'] .dls-accordion__chevron {
+  transform: rotate(180deg);
+}
+
+.dls-accordion__region {
+  /*
+   * The region itself is always in the DOM so screen readers can find
+   * it by role. The visible content lives inside .dls-accordion__content
+   * and is mounted only when the panel is open — see Accordion.tsx for
+   * the reasoning behind unmount-on-close.
+   */
+}
+
+.dls-accordion__content {
+  padding: 0 1rem 1rem 1rem;
+  line-height: 1.55;
+  color: #2a3042;
+}
