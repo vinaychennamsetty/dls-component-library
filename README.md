@@ -306,18 +306,4 @@ Things I'd pick up next, in roughly the order I'd do them:
 | `npm run format:check` | Prettier check (useful in CI).                     |
 | `npm run typecheck`   | Standalone `tsc --noEmit` pass.                     |
 
----
 
-## What I'd do differently with more time
-
-The bigger items are in the Future Improvements list above, but a few smaller things I
-noticed while building:
-
-- The CSS lives next to the component as a plain stylesheet. For a real library I'd move
-  to CSS Modules or a CSS-in-JS approach so consumers can drop a single bundle in and not
-  worry about class-name collisions or load order.
-- The id-generation strategy works but is slightly cosmetic — long auto-generated ids show
-  up in the DOM. Worth taking another pass once the testing/E2E strategy is settled.
-- The recovered test file uses the term "panel" and the brief uses "Accordion". I've used
-  "panel" for individual entries and "Accordion" for the whole component. Worth fixing the
-  terminology in a glossary so docs stay consistent.
