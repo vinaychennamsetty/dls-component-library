@@ -47,6 +47,16 @@ Accordion in both of its main modes so the component can be seen working in a re
 not only in jsdom. Storybook gives a per-component workshop with controls, docs, and
 variants.
 
+## Screenshots
+
+### Demo app
+
+![DLS Accordion demo app](docs/screenshots/demo-app.png)
+
+### Storybook docs
+
+![Accordion Storybook docs](docs/screenshots/storybook-accordion-docs.png)
+
 ---
 
 ## Tech choices
@@ -180,15 +190,15 @@ const items: AccordionItem[] = [
 
 ### Props
 
-| Prop                          | Type                       | Default | Description                                              |
-| ----------------------------- | -------------------------- | ------- | -------------------------------------------------------- |
-| `items`                       | `AccordionItem[]`          | —       | Panels to render, in display order.                      |
-| `shouldAllowMultipleExpanded` | `boolean`                  | `true`  | When `false`, opening a panel collapses any other open.  |
-| `defaultExpanded`             | `number[]`                 | `[]`    | Indices that start expanded on first render.             |
-| `headingLevel`                | `1 \| 2 \| 3 \| 4 \| 5 \| 6` | `3`     | Heading element wrapping the trigger button.             |
-| `onChange`                    | `(open: number[]) => void` | —       | Fires whenever expansion state changes.                  |
-| `className`                   | `string`                   | —       | Extra class on the outer container.                      |
-| `idPrefix`                    | `string`                   | auto    | Used to build deterministic ids when needed.             |
+| Prop                          | Type                         | Default | Description                                             |
+| ----------------------------- | ---------------------------- | ------- | ------------------------------------------------------- |
+| `items`                       | `AccordionItem[]`            | —       | Panels to render, in display order.                     |
+| `shouldAllowMultipleExpanded` | `boolean`                    | `true`  | When `false`, opening a panel collapses any other open. |
+| `defaultExpanded`             | `number[]`                   | `[]`    | Indices that start expanded on first render.            |
+| `headingLevel`                | `1 \| 2 \| 3 \| 4 \| 5 \| 6` | `3`     | Heading element wrapping the trigger button.            |
+| `onChange`                    | `(open: number[]) => void`   | —       | Fires whenever expansion state changes.                 |
+| `className`                   | `string`                     | —       | Extra class on the outer container.                     |
+| `idPrefix`                    | `string`                     | auto    | Used to build deterministic ids when needed.            |
 
 ### Implementation notes
 
@@ -241,6 +251,7 @@ The accordion follows the [WAI-ARIA Accordion pattern](https://www.w3.org/WAI/AR
 - Disabled panels expose `aria-disabled` and ignore activation.
 
 Tested explicitly in `Accordion.keyboard.test.tsx`:
+
 - Tab moves focus through the triggers in order.
 - Enter and Space on a focused trigger toggle the panel.
 - `aria-expanded` mirrors the open/closed state on every panel.
@@ -248,6 +259,7 @@ Tested explicitly in `Accordion.keyboard.test.tsx`:
   the content).
 
 What I would add given more time:
+
 - Arrow-key navigation between triggers (`Up`/`Down`, `Home`/`End`) per the WAI-ARIA
   Authoring Practices.
 - Run the demo through `axe` (e.g. `@axe-core/react` or `jest-axe`) and surface a CI report.
@@ -288,22 +300,20 @@ Things I'd pick up next, in roughly the order I'd do them:
 
 ## Scripts cheatsheet
 
-| Script              | Purpose                                              |
-| ------------------- | ---------------------------------------------------- |
-| `npm run dev`         | Vite dev server with HMR (demo app).                |
-| `npm run storybook`   | Storybook dev server on port 6006.                  |
-| `npm run build`       | Library build then demo-app build.                  |
-| `npm run build:lib`   | Library build via tsup → ESM + CJS + d.ts + css.    |
-| `npm run build:demo`  | Production build of the demo app.                   |
-| `npm run build-storybook` | Static Storybook for deployment.                |
-| `npm run preview`     | Serve the built demo for a smoke test.              |
-| `npm test`            | Single-pass Vitest run (used in CI).                |
-| `npm run test:watch`  | Watch mode while developing.                        |
-| `npm run test:coverage` | Coverage report via the V8 provider.              |
-| `npm run lint`        | ESLint over `src/**/*.{ts,tsx}`.                    |
-| `npm run lint:fix`    | Lint with autofix.                                  |
-| `npm run format`      | Prettier write.                                     |
-| `npm run format:check` | Prettier check (useful in CI).                     |
-| `npm run typecheck`   | Standalone `tsc --noEmit` pass.                     |
-
-
+| Script                    | Purpose                                          |
+| ------------------------- | ------------------------------------------------ |
+| `npm run dev`             | Vite dev server with HMR (demo app).             |
+| `npm run storybook`       | Storybook dev server on port 6006.               |
+| `npm run build`           | Library build then demo-app build.               |
+| `npm run build:lib`       | Library build via tsup → ESM + CJS + d.ts + css. |
+| `npm run build:demo`      | Production build of the demo app.                |
+| `npm run build-storybook` | Static Storybook for deployment.                 |
+| `npm run preview`         | Serve the built demo for a smoke test.           |
+| `npm test`                | Single-pass Vitest run (used in CI).             |
+| `npm run test:watch`      | Watch mode while developing.                     |
+| `npm run test:coverage`   | Coverage report via the V8 provider.             |
+| `npm run lint`            | ESLint over `src/**/*.{ts,tsx}`.                 |
+| `npm run lint:fix`        | Lint with autofix.                               |
+| `npm run format`          | Prettier write.                                  |
+| `npm run format:check`    | Prettier check (useful in CI).                   |
+| `npm run typecheck`       | Standalone `tsc --noEmit` pass.                  |
