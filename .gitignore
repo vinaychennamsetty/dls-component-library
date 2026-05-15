@@ -10,6 +10,9 @@ build/
 coverage/
 .vitest-cache/
 
+# Storybook build output
+storybook-static/
+
 # Logs
 npm-debug.log*
 yarn-debug.log*

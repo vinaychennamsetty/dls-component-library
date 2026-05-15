@@ -18,7 +18,15 @@ module.exports = {
     'plugin:react-hooks/recommended',
     'prettier',
   ],
-  ignorePatterns: ['dist', 'coverage', 'node_modules', '*.cjs', '*.config.ts'],
+  ignorePatterns: [
+    'dist',
+    'storybook-static',
+    'coverage',
+    'node_modules',
+    '*.cjs',
+    '*.config.ts',
+    '.storybook',
+  ],
   rules: {
     'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
@@ -29,6 +37,14 @@ module.exports = {
       files: ['**/*.test.{ts,tsx}', 'src/test/**/*'],
       rules: {
         '@typescript-eslint/no-explicit-any': 'off',
+      },
+    },
+    {
+      files: ['**/*.stories.@(ts|tsx)'],
+      extends: ['plugin:storybook/recommended'],
+      rules: {
+        'react-refresh/only-export-components': 'off',
+        'import/no-anonymous-default-export': 'off',
       },
     },
   ],

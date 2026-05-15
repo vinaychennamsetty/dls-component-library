@@ -17,8 +17,14 @@ team would tackle if this lived on a real backlog.
 # install dependencies
 npm install
 
+# run the demo app and Storybook together
+npm start
+
 # run the demo app (Vite dev server)
 npm run dev
+
+# run the component workshop (Storybook)
+npm run storybook
 
 # run the test suite once
 npm test
@@ -26,14 +32,20 @@ npm test
 # run tests in watch mode while developing
 npm run test:watch
 
+# build the publishable library (tsup → dist/)
+npm run build:lib
+
 # lint, format, type-check
 npm run lint
 npm run format
 npm run typecheck
 ```
 
-The demo app at `http://localhost:5173` renders the Accordion in both of its main modes so
-the component can be seen working in a real browser, not only in jsdom.
+`npm start` runs both local review surfaces together: the demo app at
+`http://localhost:5173` and Storybook at `http://localhost:6006`. The demo renders the
+Accordion in both of its main modes so the component can be seen working in a real browser,
+not only in jsdom. Storybook gives a per-component workshop with controls, docs, and
+variants.
 
 ---
 
@@ -90,6 +102,25 @@ listed.
 `.editorconfig` keeps line endings, indentation and final-newline behaviour consistent for
 contributors using different editors. Cheap to add, easy to forget, prevents the
 "everything reformatted on save" PR.
+
+### Storybook
+
+Storybook 8 with the Vite builder is wired up under `.storybook/`. It reads the same Vite
+config the rest of the project does, so stories see the same TS aliases and plugins as the
+app. The Accordion story file lives next to the component (`Accordion.stories.tsx`) and
+covers default, single-expand, initially-expanded, FAQ-style, and disabled-panel variants
+with autodocs enabled. Run `npm run storybook` for the dev server or `npm run
+build-storybook` for a static export suitable for hosting on Pages, S3, or Chromatic.
+
+### tsup for the library build
+
+The component library is built with tsup (an esbuild wrapper). Why tsup over Rollup or
+Vite-library-mode: it produces both ESM and CJS outputs with `.d.ts` types in a single
+config, esbuild keeps the build fast (sub-second for this size), and `react` /
+`react-dom` are externalised so consumers don't get a second React instance bundled into
+their app. CSS is extracted to `dist/index.css` and exposed via the package's `exports`
+field so consumers can `import 'dls-component-library/style.css'` exactly once at app
+startup.
 
 ---
 
@@ -209,10 +240,16 @@ The accordion follows the [WAI-ARIA Accordion pattern](https://www.w3.org/WAI/AR
 - `aria-expanded` reflects the open/closed state.
 - Disabled panels expose `aria-disabled` and ignore activation.
 
+Tested explicitly in `Accordion.keyboard.test.tsx`:
+- Tab moves focus through the triggers in order.
+- Enter and Space on a focused trigger toggle the panel.
+- `aria-expanded` mirrors the open/closed state on every panel.
+- Focus stays on the trigger after activation (opening a panel doesn't yank focus into
+  the content).
+
 What I would add given more time:
-- Arrow-key navigation between triggers (`Up`/`Down`, `Home`/`End`).
-- Optional `Enter`/`Space` activation tests — `userEvent.click` covers the happy path but
-  explicit keyboard tests are worth having on a component this fundamental.
+- Arrow-key navigation between triggers (`Up`/`Down`, `Home`/`End`) per the WAI-ARIA
+  Authoring Practices.
 - Run the demo through `axe` (e.g. `@axe-core/react` or `jest-axe`) and surface a CI report.
 
 ---
@@ -221,26 +258,29 @@ What I would add given more time:
 
 Things I'd pick up next, in roughly the order I'd do them:
 
-- **CI**: GitHub Actions workflow running `typecheck`, `lint`, `test` on every PR plus a
-  required status check on main. Cache `node_modules` between runs.
-- **Compound-components API** for the Accordion (see above).
-- **Visual workshop**: Storybook (or Ladle for a lighter footprint) so designers can review
-  components without spinning up the demo app. Stories double as living documentation.
-- **Documentation site**: an MDX-based docs site so prop tables and usage examples ship
-  next to the components.
-- **Bundle**: ship the library as a published package. Add `tsup` (or Vite library mode) to
-  emit ESM + CJS + `.d.ts`, point `exports` correctly, and tree-shake out the demo app.
-- **Visual regression**: Chromatic or Playwright snapshots. Worth it the moment we have a
-  designer reviewing PRs.
-- **Accessibility automation**: `jest-axe` in unit tests + an axe pass in the visual
-  workshop.
+- **CI**: GitHub Actions workflow running `typecheck`, `lint`, `test`, `build:lib`, and
+  `build-storybook` on every PR plus a required status check on main. Cache `node_modules`
+  between runs.
+- **Compound-components API** for the Accordion (see above) layered on top of the current
+  items API — the items API stays as the easy path, compound components unlock custom
+  layouts.
+- **Documentation site**: extend Storybook's autodocs into an MDX-based docs site (or
+  publish the Storybook static build itself to Pages).
+- **Visual regression**: Chromatic against the Storybook build, or Playwright snapshots.
+  Worth wiring in the moment we have a designer reviewing PRs.
+- **Accessibility automation**: `jest-axe` in unit tests + an axe pass in Storybook via
+  `@storybook/addon-a11y`.
 - **Conventional Commits + Changesets**: drives the changelog and version bumps from PR
   metadata rather than someone having to remember.
 - **Pre-commit hooks**: lefthook (or husky + lint-staged) running `prettier --write` and
   `eslint --fix` on staged files so formatting drift never reaches a PR.
+- **Arrow-key navigation** between Accordion triggers (Up/Down/Home/End) per the WAI-ARIA
+  Authoring Practices.
 - **Theming**: design tokens consumed via CSS custom properties so components inherit
   light/dark/brand themes from a single source of truth.
-- **Keyboard navigation tests** for the Accordion (Up/Down/Home/End between triggers).
+- **Publish to a private registry**: GitHub Packages or a private npm. The `dist`
+  artefact, `exports` field, and dual ESM/CJS output are already in place — what's missing
+  is the registry + the release workflow.
 - **i18n surface**: nothing string-bound is in the component today, but worth a note —
   any future text additions should accept ReactNode rather than `string` only.
 
@@ -250,17 +290,21 @@ Things I'd pick up next, in roughly the order I'd do them:
 
 | Script              | Purpose                                              |
 | ------------------- | ---------------------------------------------------- |
-| `npm run dev`       | Vite dev server with HMR.                            |
-| `npm run build`     | Type-check then build production assets.             |
-| `npm run preview`   | Serve the built output for a quick smoke test.       |
-| `npm test`          | Single-pass Vitest run (used in CI).                 |
-| `npm run test:watch`| Watch mode while developing.                         |
-| `npm run test:coverage` | Coverage report via the V8 provider.             |
-| `npm run lint`      | ESLint over `src/**/*.{ts,tsx}`.                     |
-| `npm run lint:fix`  | Lint with autofix.                                   |
-| `npm run format`    | Prettier write.                                      |
-| `npm run format:check` | Prettier check (useful in CI).                    |
-| `npm run typecheck` | Standalone `tsc --noEmit` pass.                      |
+| `npm run dev`         | Vite dev server with HMR (demo app).                |
+| `npm run storybook`   | Storybook dev server on port 6006.                  |
+| `npm run build`       | Library build then demo-app build.                  |
+| `npm run build:lib`   | Library build via tsup → ESM + CJS + d.ts + css.    |
+| `npm run build:demo`  | Production build of the demo app.                   |
+| `npm run build-storybook` | Static Storybook for deployment.                |
+| `npm run preview`     | Serve the built demo for a smoke test.              |
+| `npm test`            | Single-pass Vitest run (used in CI).                |
+| `npm run test:watch`  | Watch mode while developing.                        |
+| `npm run test:coverage` | Coverage report via the V8 provider.              |
+| `npm run lint`        | ESLint over `src/**/*.{ts,tsx}`.                    |
+| `npm run lint:fix`    | Lint with autofix.                                  |
+| `npm run format`      | Prettier write.                                     |
+| `npm run format:check` | Prettier check (useful in CI).                     |
+| `npm run typecheck`   | Standalone `tsc --noEmit` pass.                     |
 
 ---
 

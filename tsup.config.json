@@ -1,0 +1,13 @@
+{
+  "entry": ["src/lib.ts"],
+  "outDir": "dist",
+  "format": ["esm", "cjs"],
+  "dts": true,
+  "sourcemap": true,
+  "clean": false,
+  "minify": false,
+  "splitting": false,
+  "treeshake": true,
+  "target": "es2020",
+  "external": ["react", "react-dom", "react/jsx-runtime"]
+}
